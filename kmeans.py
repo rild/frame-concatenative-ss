@@ -93,6 +93,7 @@ if __name__ == "__main__":
 
     data_root = "./res/jsut"
     print("target: ", data_root)
+    Mel = FileSourceDataset(MelSpecDataSource(data_root))
 
 
 '''
