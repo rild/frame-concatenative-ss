@@ -3,7 +3,6 @@ import pickle
 from sklearn.cluster import KMeans
 import numpy as np
 
-from docopt import docopt
 from nnmnkwii.datasets import FileSourceDataset, FileDataSource
 
 def loader(filename):
@@ -90,12 +89,9 @@ class LinearSpecDataSource(_NPYDataSource):
         super(LinearSpecDataSource, self).__init__(data_root, 0)
 
 if __name__ == "__main__":
-    args = docopt(__doc__)
-    print("Command line args:\n", args)
-
     n_clusters = 400
 
-    data_root = args["--data-root"]
+    data_root = "./res/jsut"
     print("target: ", data_root)
 
 
