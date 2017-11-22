@@ -1,1 +1,7 @@
-res
+res/
+out/
+*.pkl
+
+.idea/
+
+
