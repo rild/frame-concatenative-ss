@@ -3,6 +3,11 @@ import kmeans as k
 from os.path import join
 import numpy as np
 
+def min_max(x, axis=None):
+    min = x.min(axis=axis, keepdims=True)
+    max = x.max(axis=axis, keepdims=True)
+    result = (x-min)/(max-min)
+    return result
 
 # Generate waveform from kmeans class center vector
 def main():
@@ -25,5 +30,11 @@ def main():
     print("compare data structure ----")
     print("mel: ", mel.shape)
     print("mel_: ", mel_.shape)
+
+    print("mel data:", mel)
+    print("mel_ data:", mel_)
+
+    print("min-max mel_ data:", min_max(mel_))
+
 if __name__ == '__main__':
     main()
