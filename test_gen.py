@@ -15,5 +15,5 @@ def main():
     label = np.load(join('res/label', label_npy_filename))
     kmeans = k.load_pkl(filename)
 
-if __name == '__main__':
+if __name__ == '__main__':
     main()
