@@ -15,9 +15,12 @@ def main():
     label = np.load(join('res/label', label_npy_filename))
     kmeans = k.load_pkl(filename)
 
-    mel_ = np.empty((0, 80), np.float32)
+    print("mel", mel.shape)
+    print("label", label.shape)
+
+    mel_ = np.empty((80,), np.float32)
     for i in range(len(label)):
-        mel_ = np.append(mel_, kmeans.cluster_centers_[i])
+        mel_ = np.vstack((mel_, kmeans.cluster_centers_[i]))
 
     print("compare data structure ----")
     print("mel: ", mel.shape)
