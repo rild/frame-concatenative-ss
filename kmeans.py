@@ -9,67 +9,6 @@ import numpy as np
 
 from nnmnkwii.datasets import FileSourceDataset, FileDataSource
 
-def loader(filename):
-    with open(filename, 'rb') as f:
-        filename
-    return obj
-
-def stft_data_loader(ffile, tfile, Zxxfile):
-    f = loader(ffile)
-    t = loader(tfile)
-    Zxx = loader(Zxxfile)
-    return f, t, Zxx
-
-def generate_cluster_center_wav(kmeans):
-    labels = kmeans.labels_
-
-    gen = np.empty((0, 80), np.float32)
-    # first = True
-    for i in labels:
-        if first:
-            centers = kmeans.cluster_centers_[labels[0]]  # TO FIX
-            first = False
-        else:
-            centers = np.vstack((centers, kmeans.cluster_centers_[i]))
-    print(centers.shape)
-
-    ZxxC = centers.T
-    print(ZxxC.shape)
-
-    with open(rpath + 'generated' + 'ZxxC_kmpp_30.pickle', 'wb') as file:
-        pickle.dump(ZxxC, file)
-
-    # with open('hanekawa_nandemoha01' + '_t_km.pickle', 'wb') as file:
-    #     pickle.dump(t_km, file)
-
-def clustering():
-    fname = 'hanekawa_nandemoha01'
-
-    rpath = 'res/'
-    t_filename = rpath + fname + '_t.pickle'
-    f_filename = rpath + fname + '_f.pickle'
-    Zxx_filename = rpath + fname + '_Zxx.pickle'
-
-
-    f, t, Zxx = stft_data_loader(f_filename,
-                                 t_filename,
-                                 Zxx_filename)
-
-    ZxxT = Zxx.T
-
-
-    kmeans = KMeans(n_clusters=n_clusters,
-        init='k-means++',
-        n_init=10,
-        max_iter=300,
-        tol=1e-04,
-        random_state=0).fit(ZxxT)
-    #  t_km = km.fit_predict(ZxxT)
-
-    labels = kmeans.labels_
-    # print(labels)
-    # print(kmeans.cluster_centers_[labels[0]])
-
 def get_path_jsut_mel():
     data_root = "./res/jsut"
     print("target: ", data_root)
@@ -115,7 +54,7 @@ def add_text(target_text, text):
 if __name__ == "__main__":
     n_clusters = 400
     filename = str(n_clusters) + "kmeans_obj.pkl"
-    
+
     # Sum dataset to an array
     # data = create_target_dataset()
     # save_nparray(data)
@@ -139,7 +78,7 @@ if __name__ == "__main__":
 
     # _, paths = get_path_jsut_mel()
     # label_ = kmeans.predict(np.load(paths[0]))
-    
+
 
     # out_dir = 'res/label/'
     # label_files_text = ''
