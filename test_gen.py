@@ -26,6 +26,7 @@ def main():
     mel_ = np.empty((80,), np.float32)
     for i in range(len(label)):
         mel_ = np.vstack((mel_, kmeans.cluster_centers_[i]))
+    mel_ = np.delete(mel_, 0, 0)
 
     print("compare data structure ----")
     print("mel: ", mel.shape)
