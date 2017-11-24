@@ -69,7 +69,6 @@ if __name__ == "__main__":
        max_iter=300,
        tol=1e-04,
        random_state=0).fit(data) # 転置いる？ 11/22
-     t_km = km.fit_predict(ZxxT)
 
     save_as_pkl(kmeans, filename)
 
