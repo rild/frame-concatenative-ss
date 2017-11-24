@@ -55,7 +55,7 @@ if __name__ == "__main__":
     n_clusters = 400
     filename = str(n_clusters) + "_kmeans_obj.pkl"
 
-    Sum dataset to an array
+    # Sum dataset to an array
     data = create_target_dataset()
     save_nparray(data)
 
