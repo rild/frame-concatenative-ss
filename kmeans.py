@@ -24,7 +24,7 @@ def get_path_jsut_mel():
 def create_target_dataset():
     lines, paths = get_path_jsut_mel()
     # print(paths)
-    dataset = np.empty((0, 80), np.float32)
+    dataset = np.empty((0, 513), np.float32) # mel:80, linear:513
     for i in tqdm(range(len(paths))):
             dataset = np.append(dataset, np.load(paths[i]), axis=0)
     print(dataset.shape)
