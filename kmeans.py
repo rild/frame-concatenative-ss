@@ -15,9 +15,9 @@ def get_path_jsut_mel():
     meta = join(data_root, "train.txt")
     with open(meta, "rb") as f:
         lines = f.readlines()
-    col_mel = 1
-    # col_sec = 0
-    lines = list(map(lambda l: l.decode("utf-8").split("|")[col_mel], lines))
+    # col_mel = 1
+    col_sec = 0
+    lines = list(map(lambda l: l.decode("utf-8").split("|")[col_sec], lines))
     paths = list(map(lambda f: join(data_root, f), lines))
     return lines, paths
 
@@ -53,25 +53,25 @@ def add_text(target_text, text):
 
 if __name__ == "__main__":
     n_clusters = 400
-    filename = str(n_clusters) + "kmeans_obj.pkl"
+    filename = str(n_clusters) + "_kmeans_obj.pkl"
 
-    # Sum dataset to an array
-    # data = create_target_dataset()
-    # save_nparray(data)
+    Sum dataset to an array
+    data = create_target_dataset()
+    save_nparray(data)
 
     # Classify the array to n classes
-    # data = np.load('dataset.npy')
-    # dataT = data.T
+    data = np.load('dataset.npy')
+    dataT = data.T
 
-    # kmeans = KMeans(n_clusters=n_clusters,
-    #    init='k-means++',
-    #    n_init=10,
-    #    max_iter=300,
-    #    tol=1e-04,
-    #    random_state=0).fit(data) # 転置いる？ 11/22
-    #  t_km = km.fit_predict(ZxxT)
+    kmeans = KMeans(n_clusters=n_clusters,
+       init='k-means++',
+       n_init=10,
+       max_iter=300,
+       tol=1e-04,
+       random_state=0).fit(data) # 転置いる？ 11/22
+     t_km = km.fit_predict(ZxxT)
 
-    # save_as_pkl(kmeans, filename)
+    save_as_pkl(kmeans, filename)
 
     # Create label array
     # kmeans = load_pkl(filename)
