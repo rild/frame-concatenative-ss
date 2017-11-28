@@ -1,5 +1,7 @@
 import kmeans as k
-
+import audio
+from hparams import hparams 
+import lws
 from os.path import join
 import numpy as np
 
@@ -9,33 +11,47 @@ def min_max(x, axis=None):
     result = (x-min)/(max-min)
     return result
 
+def _lws_processor():
+    return lws.lws(hparams.fft_size, hparams.hop_size, mode="speech")
+
 # Generate waveform from kmeans class center vector
 def main():
     # Target data
     mel_npy_filename = 'jsut-mel-00356.npy'
-    label_npy_filename = 'jsut-mel-label-00356.npy'
-    filename = "400kmeans_obj.pkl"
+    spec_npy_filename = 'jsut-spec-00356.npy'
+    label_npy_filename = 'jsut-spec-label-00356.npy'
+    filename = "400_kmeans_obj.pkl"
 
-    mel = np.load(join('res/jsut', mel_npy_filename))
+    spec = np.load(join('res/jsut', spec_npy_filename))
     label = np.load(join('res/label', label_npy_filename))
     kmeans = k.load_pkl(filename)
 
-    print("mel", mel.shape)
+
+
+    print("spec", spec.shape)
     print("label", label.shape)
 
-    mel_ = np.empty((80,), np.float32)
+    spec_ = np.empty((513,), np.float32)
     for i in range(len(label)):
-        mel_ = np.vstack((mel_, kmeans.cluster_centers_[i]))
-    mel_ = np.delete(mel_, 0, 0)
+        spec_ = np.vstack((spec_, kmeans.cluster_centers_[i]))
+    spec_ = np.delete(spec_, 0, 0)
 
     print("compare data structure ----")
-    print("mel: ", mel.shape)
-    print("mel_: ", mel_.shape)
+    print("spec: ", spec.shape)
+    print("spec_: ", spec_.shape)
 
-    print("mel data:", mel)
-    print("mel_ data:", mel_)
+    print("spec data:", spec)
+    print("spec_ data:", spec_)
 
-    print("min-max mel_ data:", min_max(mel_))
+    print("min-max spce_ data:", min_max(spec_))
+
+    waveform = audio.inv_spectrogram(spec)
+    waveform_ = audio.inv_spectrogram(spec_)
+    waveformmm_ = audio.inv_spectrogram(min_max(spec_))
+
+    audio.save_wav(waveform,'out.wav')
+    audio.save_wav(waveform, 'out_.wav')
+    audio.save_wav(waveformmm_, 'outmm_.wav')
 
 if __name__ == '__main__':
     main()
