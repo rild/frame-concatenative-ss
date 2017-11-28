@@ -114,6 +114,7 @@ if __name__ == "__main__":
 
     with open(join(out_dir, 'labels.txt'), 'w') as f:
          f.write(label_files_text)
+
 '''
 
 http://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html
