@@ -6,8 +6,10 @@ from sklearn.cluster import KMeans
 from sklearn.naive_bayes import GaussianNB
 
 import numpy as np
-
 from nnmnkwii.datasets import FileSourceDataset, FileDataSource
+
+
+import text_enc as frontend
 
 def get_path_jsut_spec():
     data_root = "./res/jsut"
@@ -32,7 +34,22 @@ def load_jsut_spec_data():
     lines =  list(map(lambda l: l.decode("utf-8").split("|")[-1], lines_))
     files = list(map(lambda l: l.decode("utf-8").split("|")[col_sec], lines_))
     paths = list(map(lambda f: join(data_root, f), lines))
+    
     return lines, files, paths
+
+def load_label_data():
+    data_root = "./res/label/"
+    meta = join(data_root, "labels.txt")
+    with open(meta, "rb") as f:
+        files = f.readlines()
+    files = list(map(lambda l: l.decode('utf-8').split('\n')[0], files))
+    labels = []
+    for i in range(len(files)):
+        labels.append(np.load(join(data_root, files[i])))
+    return labels, files
+
+def raw_to_roma(text):
+    return frontend.kana_to_roma(frontend.raw_to_kana(text))
 
 def create_target_dataset():
     lines, paths = get_path_jsut_mel()
