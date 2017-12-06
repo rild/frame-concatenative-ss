@@ -21,17 +21,18 @@ def get_path_jsut_spec():
     paths = list(map(lambda f: join(data_root, f), lines))
     return lines, paths
 
-def get_path_jsut_mel():
+def load_jsut_spec_data():
     data_root = "./res/jsut"
     print("target: ", data_root)
     meta = join(data_root, "train.txt")
     with open(meta, "rb") as f:
-        lines = f.readlines()
+        lines_ = f.readlines()
     # col_mel = 1
     col_sec = 0
-    lines = list(map(lambda l: l.decode("utf-8").split("|")[col_sec], lines))
+    lines =  list(map(lambda l: l.decode("utf-8").split("|")[-1], lines_))
+    files = list(map(lambda l: l.decode("utf-8").split("|")[col_sec], lines_))
     paths = list(map(lambda f: join(data_root, f), lines))
-    return lines, paths
+    return lines, files, paths
 
 def create_target_dataset():
     lines, paths = get_path_jsut_mel()
