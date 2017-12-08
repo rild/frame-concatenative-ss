@@ -11,11 +11,11 @@ import matplotlib.pylab as plt
 
 from tqdm import tqdm
 
-from keras.models import Model
+from keras.models import Model, load_model
 from keras.layers import Input, LSTM, Dense
 import utils
 import text_enc as frontend
-
+import test_gen as generator
 
 # Hyper params
 batch_size = 16  # Batch size for training.
@@ -124,16 +124,110 @@ decoder_outputs = decoder_dense(decoder_outputs)
 
 
 # Define the model that will turn
+## OR load the model
 # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
-model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+# model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
 
 # Run training
-model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
-model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
-          batch_size=batch_size,
-                    epochs=epochs,
-                              validation_split=0.2)
+# model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+# model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
+#          batch_size=batch_size,
+#                    epochs=epochs,
+#                              validation_split=0.2)
 # Save model
-model.save('s2s.h5')
+# model.save('s2s.h5')
 
+## loat the pretrained model
+load_model('s2s.h5')
+
+encoder_model = Model(encoder_inputs, encoder_states)
+
+decoder_state_input_h = Input(shape=(latent_dim,))
+decoder_state_input_c = Input(shape=(latent_dim,))
+decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
+decoder_outputs, state_h, state_c = decoder_lstm(
+    decoder_inputs, initial_state=decoder_states_inputs)
+decoder_states = [state_h, state_c]
+decoder_outputs = decoder_dense(decoder_outputs)
+decoder_model = Model(
+    [decoder_inputs] + decoder_states_inputs,
+    [decoder_outputs] + decoder_states)
+
+reverse_target_char_index = dict(
+    (i, char) for char, i in target_token_index.items())
+
+def decode_sequence(input_seq):
+    # Encode the input as state vectors.
+    states_value = encoder_model.predict(input_seq)
+
+    # Generate empty target sequence of length 1.
+    target_seq = np.zeros((1, 1, num_decoder_tokens))
+    # Populate the first character of target sequence with the start character.
+    # target_seq[0, 0, target_token_index['\t']] = 1.
+
+    # Sampling loop for a batch of sequences
+    # (to simplify, here we assume a batch of size 1).
+    stop_condition = False
+    decoded_sentence = ''
+    while not stop_condition:
+        output_tokens, h, c = decoder_model.predict(
+            [target_seq] + states_value)
+
+        # Sample a token
+        sampled_token_index = np.argmax(output_tokens[0, -1, :])
+        sampled_char = reverse_target_char_index[sampled_token_index]
+        decoded_sentence += sampled_char
+
+        # Exit condition: either hit max length
+        # or find stop character.
+        if (sampled_char == '\n' or
+           len(decoded_sentence) > max_decoder_seq_length):
+            stop_condition = True
+
+        # Update the target sequence (of length 1).
+        target_seq = np.zeros((1, 1, num_decoder_tokens))
+        target_seq[0, 0, sampled_token_index] = 1.
+
+        # Update states
+        states_value = [h, c]
+
+    return decoded_sentence
+
+def decode_text_seq(input_seq):
+    state_value = encoder_model.predict(input_seq)
+    target_seq = np.zeros((1, 1, num_decoder_tokens)) ## 1, 1, 400
+    ## expressing which label the vector is
+    ## the output label sequence length
+    ## : max_decoder_seq_length >>> 1293
+
+    decoded_label_seq = []
+    for i in range(max_decoder_seq_length):
+        output_tokens, h, c = decoder_model.predict(
+            [target_seq] + state_value)
+
+        sampled_token_index = np.argmax(output_tokens[0, -1, :])
+        sampled_char = reverse_target_char_index[sampled_token_index]
+        
+        ## predict the next label index
+        decoded_label_seq.append(int(sampled_char))
+        
+        target_seq = np.zeros((1, 1, num_decoder_tokens))
+        target_seq[0, 0, sampled_token_index] = 1.
+        
+        states_value = [h, c]
+        
+    return decoded_label_seq
+
+for seq_index in range(100):
+    # Take one sequence (part of the training test)
+    # for trying out decoding.
+    input_seq = encoder_input_data[seq_index: seq_index + 1]
+    decoded_sentence = decode_text_seq(input_seq)
+    print('-')
+    print('Input squence:', input_seq)
+    print('Decoded sequence:', decoded_sentence)
+
+    filename = 'out%03d.wav' % seq_index
+    spectrogram = generator.inv_spec_from_label(decoded_sentence)
+    generator.save_waveform_from_spec(spectrogram, filename)
 

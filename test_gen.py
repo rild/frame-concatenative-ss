@@ -1,4 +1,4 @@
-import kmeans as k
+import utils as k
 import audio
 from hparams import hparams 
 import lws
@@ -13,6 +13,21 @@ def min_max(x, axis=None):
 
 def _lws_processor():
     return lws.lws(hparams.fft_size, hparams.hop_size, mode="speech")
+
+def inv_spec_from_label(label_seq):
+    filename = "400_kmeans_obj.pkl"
+    kmeans = k.load_pkl(filename)
+    ## frequency vector, dim = 513
+    spec_ = np.empty((513,), np.float32)
+    for i in range(len(label_seq)):
+        spec_ = np.vstack((spec_, kmeans.cluster_centers_[label_seq[i]]))
+    spec_ = np.delete(spec_, 0, 0)
+
+    return spec_
+
+def save_waveform_from_spec(spectrogram, filename):
+    waveform = audio.inv_spectrogram(spectrogram)
+    audio.save_wav(waveform, filename)
 
 # Generate waveform from kmeans class center vector
 def main():
@@ -33,7 +48,7 @@ def main():
 
     spec_ = np.empty((513,), np.float32)
     for i in range(len(label)):
-        spec_ = np.vstack((spec_, kmeans.cluster_centers_[i]))
+        spec_ = np.vstack((spec_, kmeans.cluster_centers_[label[i]]))
     spec_ = np.delete(spec_, 0, 0)
 
     print("compare data structure ----")
@@ -49,9 +64,9 @@ def main():
     waveform_ = audio.inv_spectrogram(spec_)
     waveformmm_ = audio.inv_spectrogram(min_max(spec_))
 
-    audio.save_wav(waveform,'out.wav')
-    audio.save_wav(waveform, 'out_.wav')
-    audio.save_wav(waveformmm_, 'outmm_.wav')
+    audio.save_wav(waveform,'ideal_out.wav')
+    audio.save_wav(waveform_, 'idela_out_.wav')
+    audio.save_wav(waveformmm_, 'idelal_outmm_.wav')
 
 if __name__ == '__main__':
     main()
