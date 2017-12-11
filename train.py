@@ -18,10 +18,11 @@ import text_enc as frontend
 import test_gen as generator
 
 # Hyper params
-batch_size = 16  # Batch size for training.
-epochs = 100  # Number of epochs to train for.
-latent_dim = 256  # Latent dimensionality of the encoding space.
+batch_size = 32  # Batch size for training.
+epochs = 1000  # Number of epochs to train for.
+latent_dim = 128  # Latent dimensionality of the encoding space.
 num_samples = 10000  # Number of samples to train on.
+modelname = "model_epoch%04d-latentdim%03d.h5", (epochs, latent_dim)
 
 # Preprocess input data
 #     text -> roman texts one-hot vector
@@ -126,19 +127,19 @@ decoder_outputs = decoder_dense(decoder_outputs)
 # Define the model that will turn
 ## OR load the model
 # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
-# model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
 
 # Run training
-# model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
-# model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
-#          batch_size=batch_size,
-#                    epochs=epochs,
-#                              validation_split=0.2)
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
+          batch_size=batch_size,
+                    epochs=epochs,
+                              validation_split=0.2)
 # Save model
-# model.save('s2s.h5')
-
+# model.save(modelname)
+model.save('model_s2s.h5')
 ## loat the pretrained model
-load_model('s2s.h5')
+# load_model('s2s.h5')
 
 encoder_model = Model(encoder_inputs, encoder_states)
 
