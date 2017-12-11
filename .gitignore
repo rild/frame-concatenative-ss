@@ -1,7 +1,8 @@
 res/
 out/
 *.pkl
-
+*.h5
+*.npy
 .idea/
 
 
