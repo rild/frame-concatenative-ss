@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from keras.models import Model, load_model
 from keras.layers import Input, LSTM, Dense
+from keras.callbacks import ModelCheckpoint
 import utils
 import text_enc as frontend
 import test_gen as generator
@@ -20,7 +21,7 @@ import test_gen as generator
 # Hyper params
 batch_size = 32  # Batch size for training.
 epochs = 1000  # Number of epochs to train for.
-latent_dim = 128  # Latent dimensionality of the encoding space.
+latent_dim = 64  # Latent dimensionality of the encoding space.
 num_samples = 10000  # Number of samples to train on.
 modelname = "model_epoch%04d-latentdim%03d.h5", (epochs, latent_dim)
 
@@ -131,13 +132,17 @@ model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
 
 # Run training
 model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
-model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
-          batch_size=batch_size,
-                    epochs=epochs,
-                              validation_split=0.2)
+check = ModelCheckpoint('model.hdf5')
+history = model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
+              batch_size=batch_size,
+              epochs=epochs,
+              validation_split=0.2,
+              callbacks=[check])
+
+utils.save_as_pkl(history, 'history,pkl')
 # Save model
 # model.save(modelname)
-model.save('model_s2s.h5')
+model.save('model_120class_s2s.h5')
 ## loat the pretrained model
 # load_model('s2s.h5')
 

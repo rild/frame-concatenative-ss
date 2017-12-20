@@ -15,7 +15,7 @@ def _lws_processor():
     return lws.lws(hparams.fft_size, hparams.hop_size, mode="speech")
 
 def inv_spec_from_label(label_seq):
-    filename = "400_kmeans_obj.pkl"
+    filename = "120_kmeans_obj.pkl"
     kmeans = k.load_pkl(filename)
     ## frequency vector, dim = 513
     spec_ = np.empty((513,), np.float32)
@@ -35,10 +35,10 @@ def main():
     mel_npy_filename = 'jsut-mel-00356.npy'
     spec_npy_filename = 'jsut-spec-00356.npy'
     label_npy_filename = 'jsut-spec-label-00356.npy'
-    filename = "400_kmeans_obj.pkl"
+    filename = "120_kmeans_obj.pkl"
 
     spec = np.load(join('res/jsut', spec_npy_filename))
-    label = np.load(join('res/label', label_npy_filename))
+    label = np.load(join('res/label_120', label_npy_filename))
     kmeans = k.load_pkl(filename)
 
 
