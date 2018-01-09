@@ -9,5 +9,5 @@ out/
 *.hdf5
 *.csv
 
-
+test/
 __pycache__
