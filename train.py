@@ -10,7 +10,7 @@ matplotlib.use('Agg')
 import matplotlib.pylab as plt
 
 from tqdm import tqdm
-
+from keras.callbacks import CSVLogger
 from keras.models import Model, load_model
 from keras.layers import Input, LSTM, Dense
 from keras.callbacks import ModelCheckpoint
@@ -20,9 +20,9 @@ import test_gen as generator
 
 # Hyper params
 batch_size = 32  # Batch size for training.
-epochs = 1000  # Number of epochs to train for.
+epochs = 100  # Number of epochs to train for.
 latent_dim = 64  # Latent dimensionality of the encoding space.
-num_samples = 10000  # Number of samples to train on.
+num_samples = 7666  # Number of samples to train on.
 modelname = "model_epoch%04d-latentdim%03d.h5", (epochs, latent_dim)
 
 # Preprocess input data
@@ -66,7 +66,7 @@ for label in output_label_seqs:
 
 target_label_characters = sorted(list(target_label_characters))
 num_decoder_tokens = len(target_label_characters) 
-# >>> 400 # kmeans class num
+# >>> 400 # kmeans class num  +1(EOS: -1)
 max_encoder_seq_length = max([len(e) for e in input_text_seqs])
 # >>> 135
 max_decoder_seq_length = max([len(e) for e in output_label_seqs])
@@ -133,13 +133,15 @@ model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
 # Run training
 model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
 check = ModelCheckpoint('model.hdf5')
+csv_logger = CSVLogger('training.log')
 history = model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
               batch_size=batch_size,
               epochs=epochs,
               validation_split=0.2,
-              callbacks=[check])
+              callbacks=[check, csv_logger])
 
-utils.save_as_pkl(history, 'history,pkl')
+# utils.save_as_pkl(history, 'history.pkl')
+
 # Save model
 # model.save(modelname)
 model.save('model_120class_s2s.h5')
@@ -152,7 +154,7 @@ decoder_state_input_h = Input(shape=(latent_dim,))
 decoder_state_input_c = Input(shape=(latent_dim,))
 decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
 decoder_outputs, state_h, state_c = decoder_lstm(
-    decoder_inputs, initial_state=decoder_states_inputs)
+decoder_inputs, initial_state=decoder_states_inputs)
 decoder_states = [state_h, state_c]
 decoder_outputs = decoder_dense(decoder_outputs)
 decoder_model = Model(
