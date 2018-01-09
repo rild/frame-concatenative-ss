@@ -5,4 +5,9 @@ out/
 *.npy
 .idea/
 
+*.log
+*.hdf5
+*.csv
 
+
+__pycache__
