@@ -46,6 +46,7 @@ def load_label_data():
     labels = []
     for i in range(len(files)):
         labels.append(np.load(join(data_root, files[i])))
+        labels[i] = np.append(labels[i], -1) # EOS: -1
     return labels, files
 
 def raw_to_roma(text):
@@ -103,6 +104,17 @@ def gnb(kmeans_model, features):
 
     clf.fit(features, labels)
     return clf
+
+def limit_data(texts, labels, threshold = 400):
+    _texts = []
+    _labels = []
+
+    for i in range(len(labels)):
+        if len(labels[i]) > threshold:
+            continue
+        _texts.append(texts[i])
+        _labels.append(labels[i])
+    return _texts, _labels
 
 if __name__ == "__main__":
     n_clusters = 120
